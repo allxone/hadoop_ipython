@@ -30,6 +30,7 @@ RUN mkdir -p /usr/local/notebooks && \
     cat /root/hosts_append >> /etc/hosts
 ADD ipython_notebook_config.py /root/.ipython/profile_hadoop_notebook/ipython_notebook_config.py
 ADD spark_utils.py /root/.ipython/profile_hadoop_notebook/spark_utils.py
+EXPOSE 8888
 
 CMD notebook --profile hadoop_notebook --NotebookApp.password=u'$NB_PASSWORD'
 ENTRYPOINT ipython
