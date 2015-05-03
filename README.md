@@ -1,5 +1,5 @@
 # HADOOP_IPYTHON
-cp -r /etc/hadoop .
+cp -r -L /etc/hadoop/conf ./hadoop-conf
 
 cp /etc/krb5.conf .
 

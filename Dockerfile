@@ -16,14 +16,11 @@ RUN yum -y install libXext libSM libXrender && \
 # Load Kerberos
 ADD krb5.conf /etc/krb5.conf
 
-# Load Hadoop Config
-ADD hadoop /etc/hadoop/
-ADD hive-site.xml $SPARK_HOME/conf/hive-site.xml
-ADD hosts_append /root/hosts_append
-
 # iPython Notebook
 ADD notebook.sh /
-RUN mkdir -p /usr/local/notebooks && \
+ADD hosts_append /root/hosts_append
+RUN rm -rf /etc/hadoop/conf && \
+    mkdir -p /usr/local/notebooks && \
     ipython profile create hadoop_notebook && \
     cd /usr/local/notebooks && \
     git clone https://github.com/agconti/kaggle-titanic.git && \
@@ -33,7 +30,12 @@ ADD ipython_notebook_config.py /root/.ipython/profile_hadoop_notebook/ipython_no
 ADD spark_utils.py /opt/conda/lib/python2.7/site-packages/spark_utils.py
 ENV PEM_FILE /key.pem
 
+# Load Hadoop Config
+ADD hadoop-conf /etc/hadoop/conf/
+ADD hive-site.xml $SPARK_HOME/conf/hive-site.xml
+
 EXPOSE 8888
+VOLUME /usr/local/notebooks
 
 # Default notebook pwd = password (hashed from ipython: from IPython.lib import passwd; passwd() )
 ENV NB_PASSWORD sha1:ecc7bd1b8e2a:b9464f6ed664d7c81503ad877325dab6f2d63c13
