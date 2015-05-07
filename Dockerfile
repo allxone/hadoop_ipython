@@ -10,25 +10,36 @@ RUN wget --quiet https://repo.continuum.io/archive/Anaconda-2.2.0-Linux-x86_64.s
 ENV PATH /opt/conda/bin:$PATH
 
 # Prerequisites
-RUN yum -y install libXext libSM libXrender && \
+RUN (yum -y install libXext libSM libXrender || yum -y install libXext libSM libXrender) && \
     yum clean all
 
-# Load Kerberos
+# Load Kerberos config
 ADD krb5.conf /etc/krb5.conf
 
-# iPython Notebook
+### IPython Notebook
+# Default notebook pwd = password (hashed from ipython: from IPython.lib import passwd; passwd() )
+ENV NB_PASSWORD sha1:ecc7bd1b8e2a:b9464f6ed664d7c81503ad877325dab6f2d63c13
+ENV NB_USER cdhadmin
+ENV USE_HTTP 0
+ENV PEM_FILE /home/$NB_USER/key.pem
+ENV NB_LIBRARY /usr/local/notebooks
+
 ADD notebook.sh /
 ADD hosts_append /root/hosts_append
-RUN rm -rf /etc/hadoop/conf && \
-    mkdir -p /usr/local/notebooks && \
-    ipython profile create hadoop_notebook && \
-    cd /usr/local/notebooks && \
-    git clone https://github.com/agconti/kaggle-titanic.git && \
-    cat /root/hosts_append >> /etc/hosts && \
-    chmod u+x /notebook.sh
-ADD ipython_notebook_config.py /root/.ipython/profile_hadoop_notebook/ipython_notebook_config.py
+
+RUN useradd -ms /bin/bash $NB_USER \
+    && ipython profile create hadoop_notebook \
+    && cd && cp -R .bash_profile .bashrc .ipython /home/$NB_USER \
+    && chown -R $NB_USER:$NB_USER /home/$NB_USER \
+    && mkdir -p $NB_LIBRARY \
+    && cd $NB_LIBRARY \
+    && git clone https://github.com/agconti/kaggle-titanic.git \
+    && chown -R $NB_USER:$NB_USER $NB_LIBRARY \
+    && rm -rf /etc/hadoop/conf \
+    && cat /root/hosts_append >> /etc/hosts \
+    && chmod u+x /notebook.sh
+ADD ipython_notebook_config.py /home/$NB_USER/.ipython/profile_hadoop_notebook/ipython_notebook_config.py
 ADD spark_utils.py /opt/conda/lib/python2.7/site-packages/spark_utils.py
-ENV PEM_FILE /key.pem
 
 # Load Hadoop Config
 ADD hadoop-conf /etc/hadoop/conf/
@@ -37,7 +48,6 @@ ADD hive-site.xml $SPARK_HOME/conf/hive-site.xml
 EXPOSE 8888
 VOLUME /usr/local/notebooks
 
-# Default notebook pwd = password (hashed from ipython: from IPython.lib import passwd; passwd() )
-ENV NB_PASSWORD sha1:ecc7bd1b8e2a:b9464f6ed664d7c81503ad877325dab6f2d63c13
-
+USER $NB_USER
+WORKDIR $NB_LIBRARY
 CMD ["/notebook.sh"]
