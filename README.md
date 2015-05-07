@@ -7,7 +7,11 @@ cp /etc/hive/conf/hive-site.xml .
 
 #RUN
 # 8888: IPython Notebook server port
-# 8887: Spark Driver fixed port (spark.driver.port)
-# 8886: Spark REPL port (using pyspark shell, spark.replClassServer.port)
+# 51810: spark.driver.port
+# 51811: spark.fileserver.port
+# 51812: spark.broadcast.port
+# 51813: spark.replClassServer.port
+# 51814: spark.blockManager.port
 # hostname: need to be resolved by Spark Workers to permit them reach the driver
-docker run -p 8888:8888 -p 8887:8887 -p 8886:8886 --hostname=ipython1 --name hadoop_ipython --rm allxone/hadoop_ipython
+
+docker run -d -p 8888:8888 -p 51810:51810 -p 51811:51811 -p 51812:51812 -p 51813:51813 -p 51814:51814 --hostname=ipython1 --name hadoop_ipython allxone/hadoop_ipython
