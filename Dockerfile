@@ -45,6 +45,7 @@ RUN useradd -ms /bin/bash $NB_USER \
     && chmod u+x /notebook.sh
 ADD ipython_notebook_config.py /home/$NB_USER/.ipython/profile_hadoop_notebook/ipython_notebook_config.py
 ADD spark_utils.py /opt/conda/lib/python2.7/site-packages/spark_utils.py
+ADD spark_test.ipynb $NB_LIBRARY
 
 # Load Hadoop Config
 ADD hadoop-conf /etc/hadoop/conf/
@@ -52,6 +53,7 @@ ADD hive-site.xml $SPARK_HOME/conf/hive-site.xml
 
 EXPOSE $SPARK_DRIVER_PORT $SPARK_REPL_PORT $SPARK_FILESERVER_PORT $SPARK_BROADCAST_PORT $SPARK_BLOCKMGR_PORT
 VOLUME $NB_LIBRARY
+VOLUME $PEM_FILE
 
 USER $NB_USER
 WORKDIR $NB_LIBRARY
