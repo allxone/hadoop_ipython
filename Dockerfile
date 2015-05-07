@@ -23,6 +23,8 @@ ENV NB_USER cdhadmin
 ENV USE_HTTP 0
 ENV PEM_FILE /home/$NB_USER/key.pem
 ENV NB_LIBRARY /usr/local/notebooks
+ENV SPARK_DRIVER_PORT 8887
+ENV SPARK_REPL_PORT 8886
 
 ADD notebook.sh /
 ADD hosts_append /root/hosts_append
@@ -45,8 +47,8 @@ ADD spark_utils.py /opt/conda/lib/python2.7/site-packages/spark_utils.py
 ADD hadoop-conf /etc/hadoop/conf/
 ADD hive-site.xml $SPARK_HOME/conf/hive-site.xml
 
-EXPOSE 8888
-VOLUME /usr/local/notebooks
+EXPOSE 8888 8887 8886
+VOLUME $NB_LIBRARY
 
 USER $NB_USER
 WORKDIR $NB_LIBRARY

@@ -5,6 +5,8 @@ def get_spark(nameApp='nameApp', queueName='nameQueue', numExecutors='4', execut
     import glob
 
     SPARK_HOME = os.environ['SPARK_HOME']
+    SPARK_DRIVER_PORT = os.environ['SPARK_DRIVER_PORT']
+    SPARK_REPL_PORT = os.environ['SPARK_REPL_PORT']
 
     sys.path.insert(0, os.path.join(SPARK_HOME, 'python'))
 
@@ -20,7 +22,9 @@ def get_spark(nameApp='nameApp', queueName='nameQueue', numExecutors='4', execut
         .set("spark.yarn.queue", queueName)\
         .set("spark.executor.instances", numExecutors)\
         .set("spark.executor.cores", executorCores)\
-        .set("spark.executor.memory", executorMemory)
+        .set("spark.executor.memory", executorMemory)\
+	.set("spark.driver.port", SPARK_DRIVER_PORT)\
+	.set("spark.replClassServer.port", SPARK_REPL_PORT)
     sc = SparkContext(conf=conf)
     
     return sc
