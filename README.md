@@ -14,4 +14,4 @@ cp /etc/hive/conf/hive-site.xml .
 # 51814: spark.blockManager.port
 # hostname: need to be resolved by Spark Workers to permit them reach the driver
 
-docker run -d -p 8888:8888 -p 51810:51810 -p 51811:51811 -p 51812:51812 -p 51813:51813 -p 51814:51814 --hostname=ipython1 --name hadoop_ipython allxone/hadoop_ipython
+docker run -d -v /home/core/notebooks:/usr/local/notebooks -p 8888:8888 -p 51810:51810 -p 51811:51811 -p 51812:51812 -p 51813:51813 -p 51814:51814 --hostname=ipython1 --name hadoop_ipython allxone/hadoop_ipython
